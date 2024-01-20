@@ -1,25 +1,37 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { gsap } from "gsap";
 
 const Token = () => {
   const [data, setData] = useState([]);
 
-  const getData = async () => {
-    try {
-      const response = await axios.get(
-        "https://backend-matrix-lap.vercel.app/data/"
-      );
-      setData(response.data.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await axios.get(
+          "https://backend-matrix-lap.vercel.app/data/"
+        );
+        setData(response.data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
     getData();
   }, []); // Adding an empty dependency array to ensure useEffect runs only once
 
-  console.log(data);
+  useEffect(() => {
+    const tl = gsap.timeline({ repeat: -1 });
+
+    data.forEach((ele, index) => {
+      tl.to(`.image-${index}`, {
+        opacity: 1,
+        duration: 5,
+        x: 0,
+      });
+      tl.to({}, { duration: 0.2 });
+    });
+  }, [data]);
 
   return (
     <>
@@ -32,12 +44,12 @@ const Token = () => {
         habitant morbi
       </h1>
       <div className="w-[60%] m-auto grid grid-cols-3 gap-8 items-center justify-center text-center mt-8 ">
-        {data.map((ele) => (
+        {data.map((ele, index) => (
           <div
             key={ele.id}
             className="border-4 border-yellow-500 py-6 text-center rounded-xl bg-[rgb(20,20,17)]">
             <div className="flex items-center justify-center">
-              <div className="w-[50%]">
+              <div className={`w-[50%] image-${index}`}>
                 <img className="w-full" src={ele.img} alt="" />
               </div>
             </div>
